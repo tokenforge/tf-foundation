@@ -1,6 +1,6 @@
 {
-  "name": "self-contracts",
-  "version": "1.0.0",
+  "name": "tf-nft.contracts",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -50,12 +50,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@gitlab.com:tokenforge-gmbh/self/self-contracts.git"
+    "url": "git@gitlab.com:tokenforge-gmbh/contracts/tf-nft-contracts.git"
   },
   "author": "Hagen Hübel <hagen@token-forge.io>",
   "license": "(C) 2022 by TokenForge GmbH",
   "bugs": {
-    "url": "git@gitlab.com:tokenforge-gmbh/self/self-contracts.git"
+    "url": "git@gitlab.com:tokenforge-gmbh/contracts/tf-nft-contracts.git"
   },
   "homepage": "https://token-forge.io",
   "devDependencies": {
