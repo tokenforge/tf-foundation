@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 
 import {BigNumber, BigNumberish, Signer} from "ethers";
-import {TokenForge1155, TokenForge1155__factory} from "../typechain";
+import {TokenForge1155, TokenForge1155__factory} from "../../typechain";
 
 
 chai.use(chaiAsPromised);
