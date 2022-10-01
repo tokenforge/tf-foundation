@@ -40,7 +40,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     */
 
 
-    const credentials = {apiKey: process.env._RELAYER_KEY, apiSecret: process.env._RELAYER_SECRET};
+    /*const credentials = {apiKey: process.env._RELAYER_KEY, apiSecret: process.env._RELAYER_SECRET};
     // @ts-ignore
     const provider = new DefenderRelayProvider(credentials);
     // @ts-ignore
@@ -53,7 +53,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         MyContract: myContract.address,
     }, null, 2));
 
-    console.log(`MyContract: ${myContract.address}\n`);
+    console.log(`MyContract: ${myContract.address}\n`);*/
 };
 
 

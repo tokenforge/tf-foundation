@@ -16,7 +16,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155Supp
 contract TokenForge1155v3Upgradeable is
     ERC1155BurnableUpgradeable,
     ERC1155SupplyUpgradeable,
-    OwnableUpgradeable,
     AccessControlEnumerableUpgradeable
 {
     using ECDSAUpgradeable for bytes32;
@@ -33,21 +32,21 @@ contract TokenForge1155v3Upgradeable is
     /**
      * @dev Throws if called by any account other than the owner.
      */
-    modifier onlyOwnerOrAdmin() {
+    modifier onlyAdmin() {
         require(
-            owner() == _msgSender() || hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
-            "TokenForge1155v3: caller is not the owner nor admin"
+            hasRole(DEFAULT_ADMIN_ROLE, _msgSender()),
+            "TokenForge1155v3Upgradeable: caller is not the owner nor admin"
         );
         _;
     }
 
     modifier onlyMinter() {
-        require(hasRole(MINTER_ROLE, _msgSender()), "TokenForge1155v3: caller has no minter role");
+        require(hasRole(MINTER_ROLE, _msgSender()), "TokenForge1155v3Upgradeable: caller has no minter role");
         _;
     }
 
     modifier tokenIsDefined(uint256 tokenId) {
-        require(isTokenDefined(tokenId), "TokenForge1155v3: token is not defined yet");
+        require(isTokenDefined(tokenId), "TokenForge1155v3Upgradeable: token is not defined yet");
         _;
     }
 
@@ -60,7 +59,11 @@ contract TokenForge1155v3Upgradeable is
     mapping(uint256 => string) private _tokenUris;
 
     function initialize(address signer_, string memory baseUri_) public initializer {
-        __ERC1155_init(baseUri_);
+        __ERC1155Burnable_init_unchained();
+        __ERC1155Supply_init_unchained();
+        __AccessControlEnumerable_init_unchained();
+
+        __ERC1155_init_unchained(baseUri_);
 
         _signer = signer_;
 
@@ -74,7 +77,7 @@ contract TokenForge1155v3Upgradeable is
         return _signer;
     }
 
-    function setSigner(address signer_) external onlyOwnerOrAdmin {
+    function setSigner(address signer_) external onlyAdmin {
         address oldSigner = _signer;
 
         _signer = signer_;
@@ -117,7 +120,7 @@ contract TokenForge1155v3Upgradeable is
 
         // verifies that the sha3(account, nonce, address(this)) has been signed by _allowancesSigner
         if (message.recover(signature) != signer()) {
-            revert("Either signature is wrong or parameters have been corrupted");
+            revert("TokenForge1155v3Upgradeable: Either signature is wrong or parameters have been corrupted");
         }
 
         return message;
@@ -222,7 +225,7 @@ contract TokenForge1155v3Upgradeable is
         return _tokenUris[id];
     }
 
-    function setTokenUri(uint256 id, string memory tokenUri) external onlyOwner {
+    function setTokenUri(uint256 id, string memory tokenUri) external onlyAdmin {
         _setTokenUri(id, tokenUri);
     }
 
@@ -230,7 +233,7 @@ contract TokenForge1155v3Upgradeable is
         _tokenUris[id] = tokenUri;
     }
 
-    function withdraw() external onlyOwnerOrAdmin {
+    function withdraw() external onlyAdmin {
         uint256 balance = address(this).balance;
         payable(msg.sender).transfer(balance);
     }
