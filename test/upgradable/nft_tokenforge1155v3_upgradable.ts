@@ -1,18 +1,23 @@
-import {ethers} from 'hardhat';
+import {ethers, upgrades} from 'hardhat';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 
 import {BigNumber, BigNumberish, Signer} from "ethers";
-import {TokenForge1155v3, TokenForge1155v3__factory, Twlvxtwlv_v01, Twlvxtwlv_v01__factory} from "../typechain";
+import {
+    TokenForge1155v3,
+    TokenForge1155v3__factory,
+    TokenForge1155v3Upgradeable,
+    TokenForge1155v3Upgradeable__factory
+} from "../../typechain";
 
 
 chai.use(chaiAsPromised);
 const {expect} = chai;
 
-describe('twlvxtwlv_v01 BasicTests', () => {
-    let token: Twlvxtwlv_v01,
+describe('TokenForge1155v3 Upgradeable BasicTests', () => {
+    let token: TokenForge1155v3Upgradeable,
         axel: SignerWithAddress,
         ben: SignerWithAddress,
         chantal: SignerWithAddress,
@@ -34,12 +39,17 @@ describe('twlvxtwlv_v01 BasicTests', () => {
     beforeEach(async () => {
         [axel, ben, chantal, governance, backend] = await ethers.getSigners();
 
-        const tokenFactory = (await ethers.getContractFactory('twlvxtwlv_v01', governance)) as Twlvxtwlv_v01__factory;
+        try {
+            const tokenFactory = (await ethers.getContractFactory('TokenForge1155v3Upgradeable', governance)) as TokenForge1155v3Upgradeable__factory;
 
-        token = await tokenFactory.deploy(backend.address, 'ipfs://');
-        await token.deployed();
+            token = (await upgrades.deployProxy(tokenFactory, [backend.address, 'ipfs://'])) as TokenForge1155v3Upgradeable;
+            await token.deployed();
 
-        expect(token.address).to.properAddress;
+            expect(token.address).to.properAddress;
+        }
+        catch(e) {
+            console.log(e);
+        }
     });
 
     describe('we can mint tokens', async () => {
@@ -51,9 +61,9 @@ describe('twlvxtwlv_v01 BasicTests', () => {
         let sigForBenCreate: string,
             sigForAxelMint: string,
             sigForChantalMint: string,
-            axelAsMinter: Twlvxtwlv_v01,
-            benAsMinter: Twlvxtwlv_v01,
-            chantalAsMinterWithSignature: Twlvxtwlv_v01;
+            axelAsMinter: TokenForge1155v3,
+            benAsMinter: TokenForge1155v3,
+            chantalAsMinterWithSignature: TokenForge1155v3;
 
         beforeEach(async () => {
             // Signature for Ben to create a token into axels wallet
@@ -109,18 +119,17 @@ describe('twlvxtwlv_v01 BasicTests', () => {
             await checkTokenBalanceForAxel(totalSupplyBefore);
 
             await chantalAsMinterWithSignature.mintWithSignature(tokenId, amount, sigForChantalMint);
-            //await checkTokenBalanceForAxel(totalSupplyBefore, 1);
         });
 
         it('should fail when minting tokens happens without creation', async () => {
             const balanceBefore = await token.balanceOf(axel.address, tokenId);
             expect(balanceBefore).to.eq(0);
 
-            await expect(chantalAsMinterWithSignature.mintWithSignature(tokenId, amount, sigForAxelMint)).to.be.revertedWith('twlvxtwlv_v01: token is not defined yet');
+            await expect(chantalAsMinterWithSignature.mintWithSignature(tokenId, amount, sigForAxelMint)).to.be.revertedWith('TokenForge1155v3: token is not defined yet');
         });
 
         it('should fail when non-minter-role will create tokens', async () => {
-            await expect(benAsMinter.create(ben.address, tokenId, amount, hash)).to.be.revertedWith('twlvxtwlv_v01: caller has no minter role');
+            await expect(benAsMinter.create(ben.address, tokenId, amount, hash)).to.be.revertedWith('TokenForge1155v3: caller has no minter role');
         });
 
     })
@@ -134,7 +143,7 @@ describe('twlvxtwlv_v01 BasicTests', () => {
 
         it('will revert if non-owners will change signer account', async() => {
             const benAsSigner = token.connect(ben)
-            await expect(benAsSigner.setSigner(axel.address)).to.be.revertedWith('twlvxtwlv_v01: caller is not the owner nor admin')
+            await expect(benAsSigner.setSigner(axel.address)).to.be.revertedWith('TokenForge1155v3: caller is not the owner nor admin')
         })
 
         it('governance can change signer account', async() => {
@@ -144,7 +153,7 @@ describe('twlvxtwlv_v01 BasicTests', () => {
         })
 
         it('Withdrawal as non-owner will be reverted', async () => {
-            await expect(axelAsMinter.withdraw()).to.be.revertedWith('twlvxtwlv_v01: caller is not the owner')
+            await expect(axelAsMinter.withdraw()).to.be.revertedWith('TokenForge1155v3: caller is not the owner')
         })
 
     });

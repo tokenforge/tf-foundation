@@ -5,14 +5,14 @@ import chaiAsPromised from 'chai-as-promised';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 
 import {BigNumber, BigNumberish, Signer} from "ethers";
-import {TokenForge1155v3, TokenForge1155v3__factory} from "../typechain";
+import {TokenForge1155v2, TokenForge1155v2__factory} from "../../typechain";
 
 
 chai.use(chaiAsPromised);
 const {expect} = chai;
 
-describe('TokenForge1155v3 BasicTests', () => {
-    let token: TokenForge1155v3,
+describe('TokenForge1155v2 BasicTests', () => {
+    let token: TokenForge1155v2,
         axel: SignerWithAddress,
         ben: SignerWithAddress,
         chantal: SignerWithAddress,
@@ -34,7 +34,7 @@ describe('TokenForge1155v3 BasicTests', () => {
     beforeEach(async () => {
         [axel, ben, chantal, governance, backend] = await ethers.getSigners();
 
-        const tokenFactory = (await ethers.getContractFactory('TokenForge1155v3', governance)) as TokenForge1155v3__factory;
+        const tokenFactory = (await ethers.getContractFactory('TokenForge1155v2', governance)) as TokenForge1155v2__factory;
 
         token = await tokenFactory.deploy(backend.address, 'ipfs://');
         await token.deployed();
@@ -48,84 +48,55 @@ describe('TokenForge1155v3 BasicTests', () => {
             amount = 1,
             hash = 'NgcFOAfYXwVrmQrUOyB0U5kWU4w1a8Gf2gPPTPBrGTqTl-6qe7ERStbEMamFV4niv1bhFKI5167vzMLApLOEBs0ArvvUiClrRAFb=w600';
 
-        let sigForBenCreate: string,
-            sigForAxelMint: string,
-            sigForChantalMint: string,
-            axelAsMinter: TokenForge1155v3,
-            benAsMinter: TokenForge1155v3,
-            chantalAsMinterWithSignature: TokenForge1155v3;
+        let sigForAxel: string,
+            axelAsMinter: TokenForge1155v2,
+            chantalAsMinter: TokenForge1155v2;
 
         beforeEach(async () => {
-            // Signature for Ben to create a token into axels wallet
-            sigForBenCreate = await createSignature(axel.address, tokenId, amount, hash, backend);
-            sigForAxelMint = await createSignature(axel.address, tokenId, amount, '', backend);
-            sigForChantalMint = await createSignature(chantal.address, tokenId, amount, '', backend);
-            
+            sigForAxel = await createSignature(axel.address, tokenId, amount, hash, backend);
             axelAsMinter = token.connect(axel);
-            benAsMinter = token.connect(ben);
-            chantalAsMinterWithSignature = token.connect(chantal);
+            chantalAsMinter = token.connect(chantal);
 
-            // Only Axel gets Minter role
-            // Chantal will sign with createMessage-signature
-            // Ben has nothing, no roles, nada, niente
-            
             await token.grantRole(await token.MINTER_ROLE(), axel.address);
         })
         
-        const checkTokenBalanceForAxel = async(totalSupplyBefore: BigNumber, delta: number = 0) => {
+        const checkTokenBalanceForAxel = async(totalSupplyBefore: BigNumber) => {
             const balance = await token.balanceOf(axel.address, tokenId);
-            expect(balance).to.eq(1 + delta);
+            expect(balance).to.eq(1);
 
             const totalSupply = await token.totalSupply(tokenId);
-            expect(totalSupply).to.eq(totalSupplyBefore.add(amount + delta));
+            expect(totalSupply).to.eq(totalSupplyBefore.add(amount));
 
             const uri = await token.uri(tokenId);
             expect(uri).to.eq(hash);
         }
 
-        it('should create tokens to Axel successfully', async () => {
+        it('should mint tokens to Axel successfully', async () => {
             const totalSupplyBefore = await token.totalSupply(tokenId);
 
             const balanceBefore = await token.balanceOf(axel.address, tokenId);
             expect(balanceBefore).to.eq(0);
 
-            await axelAsMinter.create(axel.address, tokenId, amount, hash);
+            await axelAsMinter.mint(tokenId, amount, hash);
 
             await checkTokenBalanceForAxel(totalSupplyBefore);
-
-            await axelAsMinter.mint(tokenId, amount);
-
-            await checkTokenBalanceForAxel(totalSupplyBefore, 1);
-
         });
 
-        it('should create tokens by Ben and mint to Chantal successfully with signature', async () => {
+        it('should mint tokens to Axel successfully with signature', async () => {
             const totalSupplyBefore = await token.totalSupply(tokenId);
 
             const balanceBefore = await token.balanceOf(axel.address, tokenId);
             expect(balanceBefore).to.eq(0);
 
-            await benAsMinter.createWithSignature(axel.address, tokenId, amount, hash, sigForBenCreate);
+            await axelAsMinter.mintWithSignature(tokenId, amount, hash, sigForAxel);
+
             await checkTokenBalanceForAxel(totalSupplyBefore);
-
-            await chantalAsMinterWithSignature.mintWithSignature(tokenId, amount, sigForChantalMint);
-        });
-
-        it('should fail when minting tokens happens without creation', async () => {
-            const balanceBefore = await token.balanceOf(axel.address, tokenId);
-            expect(balanceBefore).to.eq(0);
-
-            await expect(chantalAsMinterWithSignature.mintWithSignature(tokenId, amount, sigForAxelMint)).to.be.revertedWith('TokenForge1155v3: token is not defined yet');
-        });
-
-        it('should fail when non-minter-role will create tokens', async () => {
-            await expect(benAsMinter.create(ben.address, tokenId, amount, hash)).to.be.revertedWith('TokenForge1155v3: caller has no minter role');
         });
 
     })
 
     describe('testing some governance stuff', async () => {
-        let axelAsMinter: TokenForge1155v3;
+        let axelAsMinter: TokenForge1155v2;
 
         beforeEach(async () => {
             axelAsMinter = token.connect(axel);
@@ -133,7 +104,7 @@ describe('TokenForge1155v3 BasicTests', () => {
 
         it('will revert if non-owners will change signer account', async() => {
             const benAsSigner = token.connect(ben)
-            await expect(benAsSigner.setSigner(axel.address)).to.be.revertedWith('TokenForge1155v3: caller is not the owner nor admin')
+            await expect(benAsSigner.setSigner(axel.address)).to.be.revertedWith('TokenForge1155v2: caller is not the owner nor admin')
         })
 
         it('governance can change signer account', async() => {
@@ -143,7 +114,7 @@ describe('TokenForge1155v3 BasicTests', () => {
         })
 
         it('Withdrawal as non-owner will be reverted', async () => {
-            await expect(axelAsMinter.withdraw()).to.be.revertedWith('TokenForge1155v3: caller is not the owner')
+            await expect(axelAsMinter.withdraw()).to.be.revertedWith('TokenForge1155v2: caller is not the owner')
         })
 
     });
