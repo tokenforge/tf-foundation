@@ -61,9 +61,9 @@ describe('TokenForge1155v3 Upgradeable BasicTests', () => {
         let sigForBenCreate: string,
             sigForAxelMint: string,
             sigForChantalMint: string,
-            axelAsMinter: TokenForge1155v3,
-            benAsMinter: TokenForge1155v3,
-            chantalAsMinterWithSignature: TokenForge1155v3;
+            axelAsMinter: TokenForge1155v3Upgradeable,
+            benAsMinter: TokenForge1155v3Upgradeable,
+            chantalAsMinterWithSignature: TokenForge1155v3Upgradeable;
 
         beforeEach(async () => {
             // Signature for Ben to create a token into axels wallet
@@ -125,17 +125,17 @@ describe('TokenForge1155v3 Upgradeable BasicTests', () => {
             const balanceBefore = await token.balanceOf(axel.address, tokenId);
             expect(balanceBefore).to.eq(0);
 
-            await expect(chantalAsMinterWithSignature.mintWithSignature(tokenId, amount, sigForAxelMint)).to.be.revertedWith('TokenForge1155v3: token is not defined yet');
+            await expect(chantalAsMinterWithSignature.mintWithSignature(tokenId, amount, sigForAxelMint)).to.be.revertedWith('TokenForge1155v3Upgradeable: token is not defined yet');
         });
 
         it('should fail when non-minter-role will create tokens', async () => {
-            await expect(benAsMinter.create(ben.address, tokenId, amount, hash)).to.be.revertedWith('TokenForge1155v3: caller has no minter role');
+            await expect(benAsMinter.create(ben.address, tokenId, amount, hash)).to.be.revertedWith('TokenForge1155v3Upgradeable: caller has no minter role');
         });
 
     })
 
     describe('testing some governance stuff', async () => {
-        let axelAsMinter: TokenForge1155v3;
+        let axelAsMinter: TokenForge1155v3Upgradeable;
 
         beforeEach(async () => {
             axelAsMinter = token.connect(axel);
@@ -143,7 +143,7 @@ describe('TokenForge1155v3 Upgradeable BasicTests', () => {
 
         it('will revert if non-owners will change signer account', async() => {
             const benAsSigner = token.connect(ben)
-            await expect(benAsSigner.setSigner(axel.address)).to.be.revertedWith('TokenForge1155v3: caller is not the owner nor admin')
+            await expect(benAsSigner.setSigner(axel.address)).to.be.revertedWith('TokenForge1155v3Upgradeable: caller is not the owner nor admin')
         })
 
         it('governance can change signer account', async() => {
@@ -153,7 +153,7 @@ describe('TokenForge1155v3 Upgradeable BasicTests', () => {
         })
 
         it('Withdrawal as non-owner will be reverted', async () => {
-            await expect(axelAsMinter.withdraw()).to.be.revertedWith('TokenForge1155v3: caller is not the owner')
+            await expect(axelAsMinter.withdraw()).to.be.revertedWith('TokenForge1155v3Upgradeable: caller is not the owner')
         })
 
     });
