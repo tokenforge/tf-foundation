@@ -15,23 +15,27 @@ contract TokenForge1155v3Factory is Context, AccessControlEnumerable {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
-    function createTokenForge1155v3(string memory name, address signer, string memory baseUri, bool transferOwnership) public returns (TokenForge1155v3)
-    {
+    function createTokenForge1155v3(
+        string memory name,
+        address signer,
+        string memory baseUri,
+        bool transferOwnership
+    ) public returns (TokenForge1155v3) {
         TokenForge1155v3 inst = new TokenForge1155v3(name, signer, baseUri);
 
         inst.setSigner(signer);
-        
-        if(transferOwnership) {
+
+        if (transferOwnership) {
             inst.transferOwnership(_msgSender());
         }
-        
+
         // enable caller as minter role
         inst.grantRole(inst.MINTER_ROLE(), _msgSender());
         // renounce minting role from factory
         inst.renounceRole(inst.MINTER_ROLE(), address(this));
 
         inst.grantRole(inst.DEFAULT_ADMIN_ROLE(), _msgSender());
-        
+
         inst.grantRole(inst.ADMIN_ROLE(), _msgSender());
         inst.renounceRole(inst.ADMIN_ROLE(), address(this));
 
@@ -51,11 +55,7 @@ contract TokenForge1155v3Factory is Context, AccessControlEnumerable {
      * Tokens are not sorted in any particular way, and their ordering may
      * change at any point.
      */
-    function getInstance(address creator, uint256 index)
-    public
-    view
-    returns (address)
-    {
+    function getInstance(address creator, uint256 index) public view returns (address) {
         return _deployedContracts[creator][index];
     }
 
