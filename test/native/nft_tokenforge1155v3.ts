@@ -36,7 +36,7 @@ describe('TokenForge1155v3 BasicTests', () => {
 
         const tokenFactory = (await ethers.getContractFactory('TokenForge1155v3', governance)) as TokenForge1155v3__factory;
 
-        token = await tokenFactory.deploy(backend.address, 'ipfs://');
+        token = await tokenFactory.deploy("nft", backend.address, 'ipfs://');
         await token.deployed();
 
         expect(token.address).to.properAddress;

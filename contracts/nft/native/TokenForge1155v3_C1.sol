@@ -7,7 +7,7 @@ pragma solidity >=0.8.3;
 import "./TokenForge1155v3.sol";
 
 contract TokenForge1155v3_C1 is TokenForge1155v3 {
-    constructor(address signer_, string memory baseUri_) TokenForge1155v3(signer_, baseUri_) {}
+    constructor(address signer_, string memory baseUri_) TokenForge1155v3("C1-Demo", signer_, baseUri_) {}
 
     function supportsInterface(bytes4 interfaceId) public view virtual override(TokenForge1155v3) returns (bool) {
         return super.supportsInterface(interfaceId);

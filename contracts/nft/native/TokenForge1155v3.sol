@@ -54,7 +54,11 @@ contract TokenForge1155v3 is ERC1155Burnable, ERC1155Supply, Ownable, AccessCont
     // MetaData, TokenUris
     mapping(uint256 => string) private _tokenUris;
 
-    constructor(address signer_, string memory baseUri_) ERC1155(baseUri_) {
+    // Contract name. This makes it OpenSea-compatible ("Unknown contract") 
+    string public name;
+
+    constructor(string memory name_, address signer_, string memory baseUri_) ERC1155(baseUri_) {
+        name = name_;
         _signer = signer_;
 
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
@@ -68,6 +72,10 @@ contract TokenForge1155v3 is ERC1155Burnable, ERC1155Supply, Ownable, AccessCont
     }
 
     function setSigner(address signer_) external onlyOwnerOrAdmin {
+        if(_signer == signer_ ) {
+            return;
+        }
+        
         address oldSigner = _signer;
 
         _signer = signer_;

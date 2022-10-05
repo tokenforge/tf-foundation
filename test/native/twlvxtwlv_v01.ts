@@ -126,7 +126,7 @@ describe('twlvxtwlv_v01 BasicTests', () => {
     })
 
     describe('testing some governance stuff', async () => {
-        let axelAsMinter: TokenForge1155v3;
+        let axelAsMinter: Twlvxtwlv_v01;
 
         beforeEach(async () => {
             axelAsMinter = token.connect(axel);
