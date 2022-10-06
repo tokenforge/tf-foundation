@@ -62,17 +62,6 @@ const config: HardhatUserConfig = {
             url: node_url('localhost'),
             accounts: accounts(),
         },
-        staging: {
-            url: node_url('rinkeby'),
-            accounts: accounts('rinkeby'),
-        },
-
-        rinkeby: {
-            url: node_url('rinkeby'),
-            accounts: accounts('rinkeby'),
-            gas: 2100000,
-            gasPrice: 8000000000
-        },
         mumbai: {
             url: node_url('polygon-mumbai'),
             accounts: accounts('mumbai'),
@@ -81,14 +70,24 @@ const config: HardhatUserConfig = {
             url: node_url('polygon-matic'),
             accounts: accounts('matic'),
         },
-        kovan: {
-            url: node_url('kovan'),
-            accounts: accounts('kovan'),
-        },
         goerli: {
             url: node_url('goerli'),
             accounts: accounts('goerli'),
+            gas: 2100000,
+            gasPrice: 8000000000
         },
+        arbitrum_goerli: {
+            url: node_url('ARBITRUM_GOERLI'),
+            accounts: accounts('goerli'),
+            gas: 2100000,
+            gasPrice: 8000000000
+        },
+        optimism_goerli: {
+            url: node_url('OPTIMISM_GOERLI'),
+            accounts: accounts('goerli'),
+            gas: 2100000,
+            gasPrice: 8000000000
+        },       
         fuji: {
             url: 'https://api.avax-test.network/ext/bc/C/rpc',
             gasPrice: 225000000000,
