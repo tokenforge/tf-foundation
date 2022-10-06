@@ -1,0 +1,98 @@
+import {ethers} from 'hardhat';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
+
+import {BigNumber, BigNumberish, Signer} from "ethers";
+import {
+    TokenForge1155v3,
+    TokenForge1155v3__factory,
+    TokenForge1155v3Factory,
+    TokenForge1155v3Factory__factory,
+    TokenForge20Mintable__factory,
+    TokenForge20MintableFactory,
+    TokenForge20MintableFactory__factory
+} from "../../typechain";
+import {ContractReceipt, ContractTransaction} from "@ethersproject/contracts";
+import {findEventArgsByNameFromReceipt} from "../lib/ethers-utils";
+import {loadFixture} from "ethereum-waffle";
+
+
+chai.use(chaiAsPromised);
+const {expect} = chai;
+
+describe('TokenForge20mintable Factory tests', () => {
+    let tokenFactory: TokenForge20MintableFactory,
+        axel: SignerWithAddress,
+        ben: SignerWithAddress,
+        chantal: SignerWithAddress,
+        governance: SignerWithAddress,
+        backend: SignerWithAddress,
+        tokenFactoryAsChantal: TokenForge20MintableFactory
+    ;
+
+    beforeEach(async () => {
+        [axel, ben, chantal, governance, backend] = await ethers.getSigners();
+
+        const tokenFactoryFactory = (await ethers.getContractFactory('TokenForge20MintableFactory', governance)) as TokenForge20MintableFactory__factory;
+
+        tokenFactory = await tokenFactoryFactory.deploy();
+        await tokenFactory.deployed();
+
+        expect(tokenFactory.address).to.properAddress;
+
+        tokenFactoryAsChantal = await tokenFactory.connect(chantal);
+    });
+
+    describe('we can deploy token contracts using factory', async () => {
+
+
+        it('should deploy new token contract', async () => {
+            
+            const factoryTransaction: ContractTransaction = await tokenFactoryAsChantal.createTokenForge20Mintable('TokenForge', 'TF20', true);
+            const receipt: ContractReceipt = await factoryTransaction.wait();
+            const tokenAddress = findEventArgsByNameFromReceipt(receipt, 'ContractDeployed', 'contractAddress');
+
+            expect(tokenAddress).to.be.properAddress;
+
+            const contractFactory = (await ethers.getContractFactory('TokenForge20Mintable')) as TokenForge20Mintable__factory;
+            const token = contractFactory.attach(tokenAddress);
+
+            expect(token.address).to.properAddress;
+        });
+    })
+    
+    describe('working with factories', async () => {
+        async function deployTokenForge20() {
+            const tokenTransaction: ContractTransaction = await tokenFactoryAsChantal.createTokenForge20Mintable('TokenForge', 'TF20', true);
+
+            const receipt: ContractReceipt = await tokenTransaction.wait();
+
+            const contractAddress = findEventArgsByNameFromReceipt(receipt, 'ContractDeployed', 'contractAddress');
+
+            expect(contractAddress).to.be.properAddress;
+
+            const contractFactory = (await ethers.getContractFactory('TokenForge20Mintable')) as TokenForge20Mintable__factory;
+            const token = contractFactory.attach(contractAddress);
+            
+            return {token};
+        }
+
+        it('has the proper permissions in deployed contract', async () => {
+            const {token} = await loadFixture(deployTokenForge20);
+            
+            await expect(await token.owner()).to.eq(chantal.address);
+        })
+
+        it('chantal can assign new minter', async () => {
+            const {token} = await loadFixture(deployTokenForge20);
+
+            const tokenAsChantal = token.connect(chantal);
+            await expect(tokenAsChantal.mint(ben.address, 10)).to.emit(token, 'Transfer');
+        })
+
+    })
+    
+});
+
