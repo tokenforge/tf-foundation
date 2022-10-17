@@ -99,12 +99,35 @@ const config: HardhatUserConfig = {
             gasPrice: 225000000000,
             chainId: 43114,
             accounts: accounts('fuji'),
+        },
+        // Moonbase Alpha network specification (MoonBeam)
+        moonbaseAlpha: {
+            url: 'https://rpc.api.moonbase.moonbeam.network',
+            chainId: 1287, // 0x507 in hex,
+            accounts: accounts('moonbeam')
+        },
+        evmOS: {
+            url: 'https://eth.bd.evmos.org:8545',
+            chainId: 9001,
+            accounts: accounts('evmos')
+        },
+        tEvmOS: {
+            url: 'https://eth.bd.evmos.dev:8545',
+            chainId: 9000,
+            accounts: accounts('tevmos')
         }
+
     }),
     etherscan: {
         // Your API key for Etherscan
         // Obtain one at https://etherscan.io/
-        apiKey: ETHERSCAN_API_KEY,
+        apiKey: {
+            mainnet: ETHERSCAN_API_KEY,
+            goerli: ETHERSCAN_API_KEY,
+            moonbaseAlpha: 'EER4PCJ3I7R9M6DKGI1JU2DFCABAKZ92WT',
+            
+        },
+        
     },
 
     paths: {

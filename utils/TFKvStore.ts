@@ -31,6 +31,8 @@ export async function saveContractAddress(domain: string, address: string): Prom
 }
 
 export async function saveContractAddressAndWait(domain: string, address: string) {
+    return
+    
     let res = await saveContractAddress(domain, address);
     if(!res) {
         return;
