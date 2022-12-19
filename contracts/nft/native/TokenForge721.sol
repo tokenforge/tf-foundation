@@ -16,7 +16,15 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "../../lib/Counters.sol";
 
-contract TokenForge721 is ERC721, ERC721Enumerable, ERC721Burnable, ERC721Pausable, ERC721URIStorage, Ownable, AccessControlEnumerable {
+contract TokenForge721 is
+    ERC721,
+    ERC721Enumerable,
+    ERC721Burnable,
+    ERC721Pausable,
+    ERC721URIStorage,
+    Ownable,
+    AccessControlEnumerable
+{
     using ECDSA for bytes32;
 
     using Counters for Counters.Counter;
@@ -33,7 +41,12 @@ contract TokenForge721 is ERC721, ERC721Enumerable, ERC721Burnable, ERC721Pausab
     // BaseUri
     string private _baseUri;
 
-    constructor(string memory name_, string memory symbol_, address signer_, string memory baseUri_) ERC721(name_, symbol_) {
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        address signer_,
+        string memory baseUri_
+    ) ERC721(name_, symbol_) {
         _signer = signer_;
         _baseUri = baseUri_;
     }

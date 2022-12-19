@@ -34,13 +34,17 @@ contract TokenForge721Upgradeable is
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-
     address private _signer;
     string private _baseUri;
 
     event SignerChanged(address indexed oldSigner, address indexed _signer);
 
-    function initialize(string memory name_, string memory symbol_, address signer_, string memory baseUri_) public initializer {
+    function initialize(
+        string memory name_,
+        string memory symbol_,
+        address signer_,
+        string memory baseUri_
+    ) public initializer {
         __Ownable_init_unchained();
         __ERC721_init_unchained(name_, symbol_);
         __ERC721Burnable_init_unchained();
