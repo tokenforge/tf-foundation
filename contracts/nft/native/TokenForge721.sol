@@ -34,6 +34,12 @@ contract TokenForge721 is
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
+    modifier onlyMinter() {
+        require(hasRole(MINTER_ROLE, _msgSender()), "TokenForge721: caller has no minter role");
+        _;
+    }
+
+
     // Signer
     address private _signer;
     event SignerChanged(address indexed oldSigner, address indexed _signer);
@@ -114,6 +120,17 @@ contract TokenForge721 is
     function mintTo(
         address to,
         uint256 tokenId,
+        string memory tokenUri
+    ) public onlyMinter {
+        _mint(to, tokenId);
+        if (bytes(tokenUri).length > 0) {
+            _setTokenURI(tokenId, tokenUri);
+        }
+    }
+
+    function mintToWithSignature(
+        address to,
+        uint256 tokenId,
         string memory tokenUri,
         bytes memory signature
     ) public {
@@ -124,24 +141,47 @@ contract TokenForge721 is
             _setTokenURI(tokenId, tokenUri);
         }
     }
-
+    
     function mint(
         uint256 tokenId,
-        string memory tokenUri,
-        bytes memory signature
-    ) external {
-        mintTo(msg.sender, tokenId, tokenUri, signature);
+        string memory tokenUri
+    ) external onlyMinter {
+        mintTo(msg.sender, tokenId, tokenUri);
 
         if (tokenId > _tokenIds.current()) {
             _tokenIds.set(tokenId);
         }
     }
 
-    function mintAuto(string memory tokenUri, bytes memory signature) external {
-        mintToAuto(msg.sender, tokenUri, signature);
+    function mintWithSignature(
+        uint256 tokenId,
+        string memory tokenUri,
+        bytes memory signature
+    ) external {
+        mintToWithSignature(msg.sender, tokenId, tokenUri, signature);
+
+        if (tokenId > _tokenIds.current()) {
+            _tokenIds.set(tokenId);
+        }
+    }
+
+    function mintAuto(string memory tokenUri) external onlyMinter {
+        mintToAuto(msg.sender, tokenUri);
+    }
+
+
+    function mintAutoWithSignature(string memory tokenUri, bytes memory signature) external {
+        mintToAutoWithSignature(msg.sender, tokenUri, signature);
     }
 
     function mintToAuto(
+        address to,
+        string memory tokenUri
+    ) public onlyMinter {
+        _mintToAuto(to, tokenUri);
+    }
+    
+    function mintToAutoWithSignature(
         address to,
         string memory tokenUri,
         bytes memory signature
@@ -153,6 +193,10 @@ contract TokenForge721 is
             revert("Either signature is wrong or parameters have been corrupted");
         }
 
+        _mintToAuto(to, tokenUri);
+    }
+    
+    function _mintToAuto(address to, string memory tokenUri) internal {
         _tokenIds.increment();
         uint256 tokenId = _tokenIds.current();
 

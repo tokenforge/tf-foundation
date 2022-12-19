@@ -76,7 +76,7 @@ describe('TokenForge721 BasicTests', () => {
             const balanceBefore = await token.balanceOf(axel.address);
             expect(balanceBefore).to.eq(0);
 
-            await axelAsMinter.mint(tokenId, hash, sigForAxel);
+            await axelAsMinter.mintWithSignature(tokenId, hash, sigForAxel);
 
             const balance = await token.balanceOf(axel.address);
             expect(balance).to.eq(1);
@@ -97,7 +97,7 @@ describe('TokenForge721 BasicTests', () => {
             const sig = await createSignature2(axel.address, hash, backend);
 
             // this will revert without reason
-            await expect(axelAsMinter.mintAuto(hash, sig)).to.emit(axelAsMinter, 'Transfer')
+            await expect(axelAsMinter.mintAutoWithSignature(hash, sig)).to.emit(axelAsMinter, 'Transfer')
 
             const balance = await token.balanceOf(axel.address);
             expect(balance).to.eq(1);

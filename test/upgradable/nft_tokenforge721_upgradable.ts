@@ -66,8 +66,8 @@ describe('TokenForge721 Upgradeable BasicTests', () => {
             hash = 'NgcFOAfYXwVrmQrUOyB0U5kWU4w1a8Gf2gPPTPBrGTqTl-6qe7ERStbEMamFV4niv1bhFKI5167vzMLApLOEBs0ArvvUiClrRAFb=w600';
 
         let sigForAxel: string,
-            axelAsMinter: TokenForge721,
-            chantalAsMinter: TokenForge721;
+            axelAsMinter: TokenForge721Upgradeable,
+            chantalAsMinter: TokenForge721Upgradeable;
 
         beforeEach(async () => {
             sigForAxel = await createSignature(axel.address, tokenId, hash, backend);
@@ -81,7 +81,7 @@ describe('TokenForge721 Upgradeable BasicTests', () => {
             const balanceBefore = await token.balanceOf(axel.address);
             expect(balanceBefore).to.eq(0);
 
-            await axelAsMinter.mint(tokenId, hash, sigForAxel);
+            await axelAsMinter.mintWithSignature(tokenId, hash, sigForAxel);
 
             const balance = await token.balanceOf(axel.address);
             expect(balance).to.eq(1);
@@ -102,7 +102,7 @@ describe('TokenForge721 Upgradeable BasicTests', () => {
             const sig = await createSignature2(axel.address, hash, backend);
 
             // this will revert without reason
-            await expect(axelAsMinter.mintAuto(hash, sig)).to.emit(axelAsMinter, 'Transfer')
+            await expect(axelAsMinter.mintAutoWithSignature(hash, sig)).to.emit(axelAsMinter, 'Transfer')
 
             const balance = await token.balanceOf(axel.address);
             expect(balance).to.eq(1);
