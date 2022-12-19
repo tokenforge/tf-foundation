@@ -5,7 +5,8 @@
 pragma solidity >=0.8.3;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
+
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -15,18 +16,24 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "../../lib/Counters.sol";
 
-contract TokenForge721 is ERC721, ERC721Enumerable, ERC721Burnable, ERC721Pausable, ERC721URIStorage, Ownable {
+contract TokenForge721 is ERC721, ERC721Enumerable, ERC721Burnable, ERC721Pausable, ERC721URIStorage, Ownable, AccessControlEnumerable {
     using ECDSA for bytes32;
 
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    address private _signer;
-    string private _baseUri;
+    // ***** Roles ********
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
+    // Signer
+    address private _signer;
     event SignerChanged(address indexed oldSigner, address indexed _signer);
 
-    constructor(address signer_, string memory baseUri_) ERC721("TokenForge721p", "TF7") {
+    // BaseUri
+    string private _baseUri;
+
+    constructor(string memory name_, string memory symbol_, address signer_, string memory baseUri_) ERC721(name_, symbol_) {
         _signer = signer_;
         _baseUri = baseUri_;
     }
@@ -96,7 +103,7 @@ contract TokenForge721 is ERC721, ERC721Enumerable, ERC721Burnable, ERC721Pausab
         uint256 tokenId,
         string memory tokenUri,
         bytes memory signature
-    ) public payable {
+    ) public {
         validateSignature(to, tokenId, tokenUri, signature);
 
         _mint(to, tokenId);
@@ -162,7 +169,7 @@ contract TokenForge721 is ERC721, ERC721Enumerable, ERC721Burnable, ERC721Pausab
         public
         view
         virtual
-        override(ERC721, ERC721Enumerable)
+        override(ERC721, ERC721Enumerable, AccessControlEnumerable)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);

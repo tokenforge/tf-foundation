@@ -53,7 +53,7 @@ describe('TokenForge721 Upgradeable BasicTests', () => {
 
         const tokenFactory = (await ethers.getContractFactory('TokenForge721Upgradeable', governance)) as TokenForge721Upgradeable__factory;
 
-        token = await upgrades.deployProxy(tokenFactory, [backend.address, 'ipfs://']) as TokenForge721Upgradeable;
+        token = await upgrades.deployProxy(tokenFactory, ['name', 'symbol', backend.address, 'ipfs://']) as TokenForge721Upgradeable;
         await token.deployed();
 
         expect(token.address).to.properAddress;

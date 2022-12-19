@@ -48,7 +48,7 @@ describe('TokenForge721 BasicTests', () => {
 
         const tokenFactory = (await ethers.getContractFactory('TokenForge721', governance)) as TokenForge721__factory;
 
-        token = await tokenFactory.deploy(backend.address, 'ipfs://');
+        token = await tokenFactory.deploy('name', 'symbol', backend.address, 'ipfs://');
         await token.deployed();
 
         expect(token.address).to.properAddress;

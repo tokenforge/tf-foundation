@@ -5,7 +5,8 @@
 pragma solidity >=0.8.3;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
+
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
@@ -21,21 +22,27 @@ contract TokenForge721Upgradeable is
     ERC721BurnableUpgradeable,
     ERC721PausableUpgradeable,
     ERC721URIStorageUpgradeable,
-    OwnableUpgradeable
+    OwnableUpgradeable,
+    AccessControlEnumerableUpgradeable
 {
     using ECDSAUpgradeable for bytes32;
 
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
+    // ***** Roles ********
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
+
     address private _signer;
     string private _baseUri;
 
     event SignerChanged(address indexed oldSigner, address indexed _signer);
 
-    function initialize(address signer_, string memory baseUri_) public initializer {
+    function initialize(string memory name_, string memory symbol_, address signer_, string memory baseUri_) public initializer {
         __Ownable_init_unchained();
-        __ERC721_init_unchained("TokenForge721p", "TF7");
+        __ERC721_init_unchained(name_, symbol_);
         __ERC721Burnable_init_unchained();
         __ERC721Enumerable_init_unchained();
         __ERC721Pausable_init_unchained();
@@ -185,7 +192,7 @@ contract TokenForge721Upgradeable is
         public
         view
         virtual
-        override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
+        override(ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlEnumerableUpgradeable)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
