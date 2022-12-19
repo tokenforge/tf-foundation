@@ -55,6 +55,9 @@ contract TokenForge721 is
     ) ERC721(name_, symbol_) {
         _signer = signer_;
         _baseUri = baseUri_;
+
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        _setupRole(MINTER_ROLE, _msgSender());
     }
 
     /// @notice Helper to know signers address
