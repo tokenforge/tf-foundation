@@ -37,9 +37,7 @@ contract TokenForge721Factory is Context, AccessControlEnumerable {
 
         inst.grantRole(inst.DEFAULT_ADMIN_ROLE(), _msgSender());
 
-        inst.grantRole(inst.ADMIN_ROLE(), _msgSender());
-        inst.renounceRole(inst.ADMIN_ROLE(), address(this));
-
+        inst.grantRole(inst.DEFAULT_ADMIN_ROLE(), _msgSender());
         inst.renounceRole(inst.DEFAULT_ADMIN_ROLE(), address(this));
 
         _deployedContracts[_msgSender()].push(address(inst));

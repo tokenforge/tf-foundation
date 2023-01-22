@@ -81,7 +81,7 @@ describe('TokenForge721v2 Factory tests', () => {
             const {tf721, signer} = await loadFixture(deployTokenForge712v2);
             
             const defaultAdminRole = await tf721.DEFAULT_ADMIN_ROLE();
-            const adminRole = await tf721.ADMIN_ROLE();
+            const adminRole = await tf721.DEFAULT_ADMIN_ROLE();
             const minterRole = await tf721.MINTER_ROLE();
             
             await expect(await tf721.hasRole(defaultAdminRole, chantal.address)).to.be.true;

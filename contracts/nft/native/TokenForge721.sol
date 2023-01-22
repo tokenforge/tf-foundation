@@ -31,7 +31,6 @@ contract TokenForge721 is
     Counters.Counter private _tokenIds;
 
     // ***** Roles ********
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     modifier onlyMinter() {
@@ -39,13 +38,13 @@ contract TokenForge721 is
         _;
     }
 
-
     // Signer
     address private _signer;
-    event SignerChanged(address indexed oldSigner, address indexed _signer);
+    event SignerChanged(address indexed oldSigner, address indexed newSigner);
 
     // BaseUri
     string private _baseUri;
+    event BaseUriChanged(string oldUri, string newUri);
 
     constructor(
         string memory name_,
@@ -88,16 +87,6 @@ contract TokenForge721 is
         return keccak256(abi.encode(to, tokenId, tokenUri, address(this)));
     }
 
-    /// @notice Helper that creates the message that signer needs to sign to allow a mint
-    ///         this is usually also used when creating the allowances, to ensure "message"
-    ///         is the same
-    /// @param to the beneficiary
-    /// @param tokenUri The tokenUri
-    /// @return the message to sign
-    function createMessage(address to, string memory tokenUri) public view returns (bytes32) {
-        return keccak256(abi.encode(to, tokenUri, address(this)));
-    }
-
     /// @notice This function verifies that the current request is valid
     /// @dev it verifies that parameters coming from the UI were not corrupted by a middlemen
     /// @param tokenId the tokenID in question
@@ -114,7 +103,7 @@ contract TokenForge721 is
 
         // verifies that the sha3(account, nonce, address(this)) has been signed by _allowancesSigner
         if (message.recover(signature) != signer()) {
-            revert("Either signature is wrong or parameters have been corrupted");
+            revert("validateSignature: Either signature is wrong or parameters have been corrupted");
         }
 
         return message;
@@ -126,9 +115,7 @@ contract TokenForge721 is
         string memory tokenUri
     ) public onlyMinter {
         _mint(to, tokenId);
-        if (bytes(tokenUri).length > 0) {
-            _setTokenURI(tokenId, tokenUri);
-        }
+        _setTokenURI(tokenId, tokenUri);
     }
 
     function mintToWithSignature(
@@ -140,27 +127,23 @@ contract TokenForge721 is
         validateSignature(to, tokenId, tokenUri, signature);
 
         _mint(to, tokenId);
-        if (bytes(tokenUri).length > 0) {
-            _setTokenURI(tokenId, tokenUri);
-        }
+        _setTokenURI(tokenId, tokenUri);
     }
     
     function mint(
         uint256 tokenId,
         string memory tokenUri
-    ) external onlyMinter {
+    ) public onlyMinter {
         mintTo(msg.sender, tokenId, tokenUri);
 
-        if (tokenId > _tokenIds.current()) {
-            _tokenIds.set(tokenId);
-        }
+        _tokenIds.set(tokenId);
     }
 
     function mintWithSignature(
         uint256 tokenId,
         string memory tokenUri,
         bytes memory signature
-    ) external {
+    ) public {
         mintToWithSignature(msg.sender, tokenId, tokenUri, signature);
 
         if (tokenId > _tokenIds.current()) {
@@ -188,14 +171,9 @@ contract TokenForge721 is
         address to,
         string memory tokenUri,
         bytes memory signature
-    ) public payable {
-        bytes32 message = createMessage(to, tokenUri).toEthSignedMessageHash();
-
-        // verifies that the sha3(account, nonce, address(this)) has been signed by _allowancesSigner
-        if (message.recover(signature) != signer()) {
-            revert("Either signature is wrong or parameters have been corrupted");
-        }
-
+    ) public {
+        validateSignature(to, 0, tokenUri, signature);
+        
         _mintToAuto(to, tokenUri);
     }
     
@@ -204,17 +182,21 @@ contract TokenForge721 is
         uint256 tokenId = _tokenIds.current();
 
         _mint(to, tokenId);
-        if (bytes(tokenUri).length > 0) {
-            _setTokenURI(tokenId, tokenUri);
-        }
+        _setTokenURI(tokenId, tokenUri);
     }
 
     function currentTokenId() public view returns (uint256) {
         return _tokenIds.current();
     }
 
-    function setTokenId(uint256 tokenId) external {
+    function setTokenId(uint256 tokenId) onlyOwner public {
         _tokenIds.set(tokenId);
+    }
+    
+    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal override(ERC721URIStorage) {
+        if (bytes(_tokenURI).length > 0) {
+            super._setTokenURI(tokenId, _tokenURI);
+        }
     }
 
     function _beforeTokenTransfer(
@@ -239,6 +221,10 @@ contract TokenForge721 is
         super._burn(tokenId);
     }
 
+    function burnAs(uint256 tokenId) public onlyOwner {
+        super._burn(tokenId);
+    }
+
     /**
      * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
      * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
@@ -249,15 +235,15 @@ contract TokenForge721 is
     }
 
     function setBaseUri(string memory baseUri) external onlyOwner {
+        string memory oldUri = _baseUri;
+        
         _baseUri = baseUri;
+        
+        emit BaseUriChanged(oldUri, _baseUri);
     }
 
     function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 
-    function withdraw() external onlyOwner {
-        uint256 balance = address(this).balance;
-        payable(msg.sender).transfer(balance);
-    }
 }
