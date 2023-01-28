@@ -18,6 +18,8 @@
 
 import "./TokenForge721.sol";
 
+pragma solidity >=0.8.3;
+
 contract TokenForge721gov is TokenForge721 {
     // ***** Roles ********
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");

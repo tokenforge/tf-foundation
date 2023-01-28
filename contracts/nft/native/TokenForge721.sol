@@ -92,8 +92,8 @@ contract TokenForge721 is
         }
     }
 
-    function setSigner(address signer) external onlyOwner {
-        _setSigner(signer);
+    function setSigner(address signer_) external onlyOwner {
+        _setSigner(signer_);
     }
 
     /**
