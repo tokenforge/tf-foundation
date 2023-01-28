@@ -1,20 +1,34 @@
+// SPDX-License-Identifier: MIT
+// (C) by TokenForge GmbH, Berlin
+// Author: Hagen Hübel, hagen@token-forge.io
+/**
+ * @dev Learn more about this on https://token-forge.io
+
+
+ _______    _              ______
+ |__   __|  | |            |  ____|
+ | | ___ | | _____ _ __ | |__ ___  _ __ __ _  ___
+ | |/ _ \| |/ / _ \ '_ \|  __/ _ \| '__/ _` |/ _ \
+ | | (_) |   <  __/ | | | | | (_) | | | (_| |  __/
+ |_|\___/|_|\_\___|_| |_|_|  \___/|_|  \__, |\___|
+ __/ |
+ |___/
+
+ */
+
+
 import {ethers} from 'hardhat';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 
-import {BigNumber, BigNumberish, Signer} from "ethers";
 import {
-    TokenForge1155v3,
-    TokenForge1155v3__factory,
-    TokenForge1155v3Factory,
-    TokenForge1155v3Factory__factory, TokenForge721__factory, TokenForge721Factory, TokenForge721Factory__factory
+    TokenForge721__factory, TokenForge721Factory, TokenForge721Factory__factory
 } from "../../typechain";
 import {ContractReceipt, ContractTransaction} from "@ethersproject/contracts";
 import {findEventArgsByNameFromReceipt} from "../lib/ethers-utils";
 import {loadFixture} from "ethereum-waffle";
-
 
 chai.use(chaiAsPromised);
 const {expect} = chai;
@@ -78,7 +92,7 @@ describe('TokenForge721v2 Factory tests', () => {
         }
 
         it('has the proper permissions in deployed contract', async () => {
-            const {tf721, signer} = await loadFixture(deployTokenForge712v2);
+            const {tf721} = await loadFixture(deployTokenForge712v2);
             
             const defaultAdminRole = await tf721.DEFAULT_ADMIN_ROLE();
             const adminRole = await tf721.DEFAULT_ADMIN_ROLE();
@@ -92,7 +106,7 @@ describe('TokenForge721v2 Factory tests', () => {
         })
 
         it('chantal can assign new minter', async () => {
-            const {tf721, signer} = await loadFixture(deployTokenForge712v2);
+            const {tf721} = await loadFixture(deployTokenForge712v2);
 
             const minterRole = await tf721.MINTER_ROLE();
 

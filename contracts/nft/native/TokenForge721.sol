@@ -1,6 +1,20 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 // (C) by TokenForge GmbH, Berlin
 // Author: Hagen Hübel, hagen@token-forge.io
+/**
+ * @dev Learn more about this on https://token-forge.io
+ 
+
+ _______    _              ______                   
+|__   __|  | |            |  ____|                  
+   | | ___ | | _____ _ __ | |__ ___  _ __ __ _  ___ 
+   | |/ _ \| |/ / _ \ '_ \|  __/ _ \| '__/ _` |/ _ \
+   | | (_) |   <  __/ | | | | | (_) | | | (_| |  __/
+   |_|\___/|_|\_\___|_| |_|_|  \___/|_|  \__, |\___|
+                                          __/ |     
+                                         |___/      
+
+ */
 
 pragma solidity >=0.8.3;
 
@@ -32,6 +46,7 @@ contract TokenForge721 is
 
     // ***** Roles ********
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
     modifier onlyMinter() {
         require(hasRole(MINTER_ROLE, _msgSender()), "TokenForge721: caller has no minter role");
@@ -52,11 +67,14 @@ contract TokenForge721 is
         address signer_,
         string memory baseUri_
     ) ERC721(name_, symbol_) {
-        _signer = signer_;
         _baseUri = baseUri_;
 
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+
+        _setupRole(PAUSER_ROLE, _msgSender());
         _setupRole(MINTER_ROLE, _msgSender());
+        
+        _setSigner(signer_);
     }
 
     /// @notice Helper to know signers address
@@ -65,11 +83,45 @@ contract TokenForge721 is
         return _signer;
     }
 
-    function setSigner(address signer_) external onlyOwner {
-        address oldSigner = _signer;
+    function _setSigner(address signer_) internal {
+        if(_signer != signer_) {
+            address oldSigner = _signer;
+    
+            _signer = signer_;
+            emit SignerChanged(oldSigner, _signer);
+        }
+    }
+    
+    function setSigner(address signer) external onlyOwner {
+        _setSigner(signer);
+    }
 
-        _signer = signer_;
-        emit SignerChanged(oldSigner, _signer);
+    /**
+     * @dev Pauses all token transfers.
+     *
+     * See {ERC721Pausable} and {Pausable-_pause}.
+     *
+     * Requirements:
+     *
+     * - the caller must have the `PAUSER_ROLE`.
+     */
+    function pause() public virtual {
+        require(hasRole(PAUSER_ROLE, _msgSender()), "ERC721PresetMinterPauserAutoId: must have pauser role to pause");
+        _pause();
+    }
+
+    /**
+     * @dev Unpauses all token transfers.
+     *
+     * See {ERC721Pausable} and {Pausable-_unpause}.
+     *
+     * Requirements:
+     *
+     * - the caller must have the `PAUSER_ROLE`.
+     */
+    function unpause() public virtual {
+        require(hasRole(PAUSER_ROLE, _msgSender()), "ERC721PresetMinterPauserAutoId: must have pauser role to unpause");
+        _unpause();
     }
 
     /// @notice Helper that creates the message that signer needs to sign to allow a mint
@@ -221,10 +273,6 @@ contract TokenForge721 is
         super._burn(tokenId);
     }
 
-    function burnAs(uint256 tokenId) public onlyOwner {
-        super._burn(tokenId);
-    }
-
     /**
      * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
      * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
@@ -232,6 +280,10 @@ contract TokenForge721 is
      */
     function _baseURI() internal view virtual override returns (string memory) {
         return _baseUri;
+    }
+    
+    function baseURI() public view returns (string memory) {
+        return _baseURI();
     }
 
     function setBaseUri(string memory baseUri) external onlyOwner {

@@ -1,3 +1,22 @@
+// SPDX-License-Identifier: MIT
+// (C) by TokenForge GmbH, Berlin
+// Author: Hagen Hübel, hagen@token-forge.io
+/**
+ * @dev Learn more about this on https://token-forge.io
+
+
+ _______    _              ______
+ |__   __|  | |            |  ____|
+ | | ___ | | _____ _ __ | |__ ___  _ __ __ _  ___
+ | |/ _ \| |/ / _ \ '_ \|  __/ _ \| '__/ _` |/ _ \
+ | | (_) |   <  __/ | | | | | (_) | | | (_| |  __/
+ |_|\___/|_|\_\___|_| |_|_|  \___/|_|  \__, |\___|
+ __/ |
+ |___/
+
+ */
+
+
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
@@ -22,7 +41,7 @@ describe("TokenForgeERC20Capped", function () {
     });
 
     it("Should set the right hardcap", async function () {
-      const {token, owner} = await loadFixture(deployTokenFixture);
+      const {token} = await loadFixture(deployTokenFixture);
 
       expect(await token.cap()).to.equal(50);
     });
@@ -52,7 +71,7 @@ describe("TokenForgeERC20Capped", function () {
     });
 
     it("Should fail if non-owner will try to mint tokens", async function () {
-      const { token, owner, ben, chantal } = await loadFixture(deployTokenFixture);
+      const { token, ben } = await loadFixture(deployTokenFixture);
 
       const benAsMinter = token.connect(ben);
       await expect(benAsMinter.mint(ben.address, 10)).to.be.revertedWith(

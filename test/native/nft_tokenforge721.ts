@@ -1,3 +1,22 @@
+// SPDX-License-Identifier: MIT
+// (C) by TokenForge GmbH, Berlin
+// Author: Hagen Hübel, hagen@token-forge.io
+/**
+ * @dev Learn more about this on https://token-forge.io
+
+
+ _______    _              ______
+ |__   __|  | |            |  ____|
+ | | ___ | | _____ _ __ | |__ ___  _ __ __ _  ___
+ | |/ _ \| |/ / _ \ '_ \|  __/ _ \| '__/ _` |/ _ \
+ | | (_) |   <  __/ | | | | | (_) | | | (_| |  __/
+ |_|\___/|_|\_\___|_| |_|_|  \___/|_|  \__, |\___|
+ __/ |
+ |___/
+
+ */
+
+
 import {ethers} from 'hardhat';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -10,9 +29,6 @@ import {TokenForge721, TokenForge721__factory} from "../../typechain";
 
 chai.use(chaiAsPromised);
 const {expect} = chai;
-
-const VALUES_SPV_NAME = 'Unlimited Financial Services';
-
 describe('TokenForge721 BasicTests', () => {
     let token: TokenForge721,
         axel: SignerWithAddress,
@@ -110,8 +126,6 @@ describe('TokenForge721 BasicTests', () => {
         });
 
         it('should revert when non-minter will try auto mint', async () => {
-            const sig = await createSignature(chantal.address, 0, hash, backend);
-
             // this will revert without reason
             await expect(chantalAsMinter.mintAuto(hash))
                 .to.be.revertedWith('TokenForge721: caller has no minter role');

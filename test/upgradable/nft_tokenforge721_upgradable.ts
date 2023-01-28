@@ -1,3 +1,22 @@
+// SPDX-License-Identifier: MIT
+// (C) by TokenForge GmbH, Berlin
+// Author: Hagen Hübel, hagen@token-forge.io
+/**
+ * @dev Learn more about this on https://token-forge.io
+
+
+ _______    _              ______
+ |__   __|  | |            |  ____|
+ | | ___ | | _____ _ __ | |__ ___  _ __ __ _  ___
+ | |/ _ \| |/ / _ \ '_ \|  __/ _ \| '__/ _` |/ _ \
+ | | (_) |   <  __/ | | | | | (_) | | | (_| |  __/
+ |_|\___/|_|\_\___|_| |_|_|  \___/|_|  \__, |\___|
+ __/ |
+ |___/
+
+ */
+
+
 import {ethers, upgrades} from 'hardhat';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -6,18 +25,12 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 
 import {BigNumber, BigNumberish, Signer} from "ethers";
 import {
-    TokenForge721,
-    TokenForge721__factory,
     TokenForge721Upgradeable,
     TokenForge721Upgradeable__factory
 } from "../../typechain";
 
-
 chai.use(chaiAsPromised);
 const {expect} = chai;
-
-const VALUES_SPV_NAME = 'Unlimited Financial Services';
-
 describe('TokenForge721 Upgradeable BasicTests', () => {
     let token: TokenForge721Upgradeable,
         axel: SignerWithAddress,

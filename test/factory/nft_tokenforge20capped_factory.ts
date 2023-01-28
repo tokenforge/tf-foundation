@@ -1,21 +1,32 @@
+// SPDX-License-Identifier: MIT
+// (C) by TokenForge GmbH, Berlin
+// Author: Hagen Hübel, hagen@token-forge.io
+/**
+ * @dev Learn more about this on https://token-forge.io
+
+
+ _______    _              ______
+ |__   __|  | |            |  ____|
+ | | ___ | | _____ _ __ | |__ ___  _ __ __ _  ___
+ | |/ _ \| |/ / _ \ '_ \|  __/ _ \| '__/ _` |/ _ \
+ | | (_) |   <  __/ | | | | | (_) | | | (_| |  __/
+ |_|\___/|_|\_\___|_| |_|_|  \___/|_|  \__, |\___|
+ __/ |
+ |___/
+
+ */
+
+
 import {ethers} from 'hardhat';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 
-import {BigNumber, BigNumberish, Signer} from "ethers";
 import {
-    TokenForge1155v3,
-    TokenForge1155v3__factory,
-    TokenForge1155v3Factory,
-    TokenForge1155v3Factory__factory,
     TokenForge20Capped__factory,
     TokenForge20CappedFactory,
     TokenForge20CappedFactory__factory,
-    TokenForge20Mintable__factory,
-    TokenForge20MintableFactory,
-    TokenForge20MintableFactory__factory
 } from "../../typechain";
 import {ContractReceipt, ContractTransaction} from "@ethersproject/contracts";
 import {findEventArgsByNameFromReceipt} from "../lib/ethers-utils";

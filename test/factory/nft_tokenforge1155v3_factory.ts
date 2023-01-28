@@ -1,10 +1,28 @@
+// SPDX-License-Identifier: MIT
+// (C) by TokenForge GmbH, Berlin
+// Author: Hagen Hübel, hagen@token-forge.io
+/**
+ * @dev Learn more about this on https://token-forge.io
+
+
+ _______    _              ______
+ |__   __|  | |            |  ____|
+ | | ___ | | _____ _ __ | |__ ___  _ __ __ _  ___
+ | |/ _ \| |/ / _ \ '_ \|  __/ _ \| '__/ _` |/ _ \
+ | | (_) |   <  __/ | | | | | (_) | | | (_| |  __/
+ |_|\___/|_|\_\___|_| |_|_|  \___/|_|  \__, |\___|
+ __/ |
+ |___/
+
+ */
+
+
 import {ethers} from 'hardhat';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 
-import {BigNumber, BigNumberish, Signer} from "ethers";
 import {
     TokenForge1155v3,
     TokenForge1155v3__factory,
@@ -78,7 +96,7 @@ describe('TokenForge1155v3 Factory tests', () => {
         }
 
         it('has the proper permissions in deployed contract', async () => {
-            const {tf1155, signer} = await loadFixture(deployTokenForge1155v3);
+            const {tf1155} = await loadFixture(deployTokenForge1155v3);
             
             const defaultAdminRole = await tf1155.DEFAULT_ADMIN_ROLE();
             const adminRole = await tf1155.ADMIN_ROLE();
@@ -92,7 +110,7 @@ describe('TokenForge1155v3 Factory tests', () => {
         })
 
         it('chantal can assign new minter', async () => {
-            const {tf1155, signer} = await loadFixture(deployTokenForge1155v3);
+            const {tf1155} = await loadFixture(deployTokenForge1155v3);
 
             const minterRole = await tf1155.MINTER_ROLE();
 
