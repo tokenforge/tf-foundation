@@ -73,7 +73,7 @@ contract TokenForge721 is
 
         _setupRole(PAUSER_ROLE, _msgSender());
         _setupRole(MINTER_ROLE, _msgSender());
-        
+
         _setSigner(signer_);
     }
 
@@ -84,14 +84,14 @@ contract TokenForge721 is
     }
 
     function _setSigner(address signer_) internal {
-        if(_signer != signer_) {
+        if (_signer != signer_) {
             address oldSigner = _signer;
-    
+
             _signer = signer_;
             emit SignerChanged(oldSigner, _signer);
         }
     }
-    
+
     function setSigner(address signer) external onlyOwner {
         _setSigner(signer);
     }
@@ -181,11 +181,8 @@ contract TokenForge721 is
         _mint(to, tokenId);
         _setTokenURI(tokenId, tokenUri);
     }
-    
-    function mint(
-        uint256 tokenId,
-        string memory tokenUri
-    ) public onlyMinter {
+
+    function mint(uint256 tokenId, string memory tokenUri) public onlyMinter {
         mintTo(msg.sender, tokenId, tokenUri);
 
         _tokenIds.set(tokenId);
@@ -207,28 +204,24 @@ contract TokenForge721 is
         mintToAuto(msg.sender, tokenUri);
     }
 
-
     function mintAutoWithSignature(string memory tokenUri, bytes memory signature) external {
         mintToAutoWithSignature(msg.sender, tokenUri, signature);
     }
 
-    function mintToAuto(
-        address to,
-        string memory tokenUri
-    ) public onlyMinter {
+    function mintToAuto(address to, string memory tokenUri) public onlyMinter {
         _mintToAuto(to, tokenUri);
     }
-    
+
     function mintToAutoWithSignature(
         address to,
         string memory tokenUri,
         bytes memory signature
     ) public {
         validateSignature(to, 0, tokenUri, signature);
-        
+
         _mintToAuto(to, tokenUri);
     }
-    
+
     function _mintToAuto(address to, string memory tokenUri) internal {
         _tokenIds.increment();
         uint256 tokenId = _tokenIds.current();
@@ -241,10 +234,10 @@ contract TokenForge721 is
         return _tokenIds.current();
     }
 
-    function setTokenId(uint256 tokenId) onlyOwner public {
+    function setTokenId(uint256 tokenId) public onlyOwner {
         _tokenIds.set(tokenId);
     }
-    
+
     function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal override(ERC721URIStorage) {
         if (bytes(_tokenURI).length > 0) {
             super._setTokenURI(tokenId, _tokenURI);
@@ -281,21 +274,20 @@ contract TokenForge721 is
     function _baseURI() internal view virtual override returns (string memory) {
         return _baseUri;
     }
-    
+
     function baseURI() public view returns (string memory) {
         return _baseURI();
     }
 
     function setBaseUri(string memory baseUri) external onlyOwner {
         string memory oldUri = _baseUri;
-        
+
         _baseUri = baseUri;
-        
+
         emit BaseUriChanged(oldUri, _baseUri);
     }
 
     function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
-
 }

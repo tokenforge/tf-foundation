@@ -19,7 +19,6 @@
 import "./TokenForge721.sol";
 
 contract TokenForge721gov is TokenForge721 {
-
     // ***** Roles ********
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
 
@@ -40,5 +39,4 @@ contract TokenForge721gov is TokenForge721 {
     function burnAs(uint256 tokenId) public onlyBurner {
         super._burn(tokenId);
     }
-
 }

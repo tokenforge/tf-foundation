@@ -53,7 +53,6 @@ contract TokenForge721Upgradeable is
         _;
     }
 
-
     address private _signer;
     string private _baseUri;
 
@@ -161,10 +160,7 @@ contract TokenForge721Upgradeable is
         }
     }
 
-    function mint(
-        uint256 tokenId,
-        string memory tokenUri
-    ) external onlyMinter {
+    function mint(uint256 tokenId, string memory tokenUri) external onlyMinter {
         mintTo(msg.sender, tokenId, tokenUri);
 
         if (tokenId > _tokenIds.current()) {
@@ -188,15 +184,11 @@ contract TokenForge721Upgradeable is
         mintToAuto(msg.sender, tokenUri);
     }
 
-
     function mintAutoWithSignature(string memory tokenUri, bytes memory signature) external {
         mintToAutoWithSignature(msg.sender, tokenUri, signature);
     }
 
-    function mintToAuto(
-        address to,
-        string memory tokenUri
-    ) public onlyMinter {
+    function mintToAuto(address to, string memory tokenUri) public onlyMinter {
         _mintToAuto(to, tokenUri);
     }
 
