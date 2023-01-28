@@ -25,7 +25,7 @@ contract TokenForge721gov is TokenForge721 {
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
 
     modifier onlyBurner() {
-        require(hasRole(BURNER_ROLE, _msgSender()), "TokenForge721: caller has no burner role");
+        require(hasRole(BURNER_ROLE, _msgSender()), "TokenForge721gov: caller has no burner role");
         _;
     }
 

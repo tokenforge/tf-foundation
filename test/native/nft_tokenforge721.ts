@@ -154,17 +154,17 @@ describe('TokenForge721 BasicTests', () => {
         })
         
         describe('with Axel as a minter', async () => {
-            
+
             let axelAsMinter: TokenForge721;
 
 
-            beforeEach( async() => {
+            beforeEach(async () => {
                 const minterRole = await token.MINTER_ROLE();
                 await token.grantRole(minterRole, axel.address)
 
                 axelAsMinter = token.connect(axel);
             })
-            
+
             it('should auto mint tokens to Axel successfully', async () => {
                 const totalSupplyBefore = await token.totalSupply();
 
@@ -208,6 +208,37 @@ describe('TokenForge721 BasicTests', () => {
                 const uri = await token.tokenURI(tokenId);
                 expect(uri).to.eq('ipfs://' + hash);
             });
+
+            it('Axel should be able to burn his own tokens', async () => {
+                // this will revert without reason
+                expect(axelAsMinter.mint(512, hash))
+                    .to.emit(axelAsMinter, 'Transfer')
+                    .withArgs(ethers.constants.AddressZero, axel.address, 512)
+                
+                await expect(axelAsMinter.burn(512))
+                    .to.emit(token, 'Transfer')
+                    .withArgs(axel.address, ethers.constants.AddressZero, 512)
+            })
+
+            it('Ben should NOT be able to burn Axels tokens', async () => {
+                // this will revert without reason
+                await axelAsMinter.mint(512, hash)
+
+                const benAsBurner = token.connect(ben);
+                await expect(benAsBurner.burn(512))
+                    .to.revertedWith('ERC721: caller is not token owner nor approved')                 
+            })
+
+            it('Ben should be allowed to burn Axels tokens once he got approval from Axel to do that', async () => {
+                // this will revert without reason
+                await axelAsMinter.mint(512, hash)
+                await axelAsMinter.approve(ben.address, 512);
+
+                const benAsBurner = token.connect(ben);
+                await expect(benAsBurner.burn(512))
+                    .to.emit(token, 'Transfer')
+                    .withArgs(axel.address, ethers.constants.AddressZero, 512)
+            })
 
         })
 
