@@ -16,7 +16,6 @@ coverage*
 
 typechain/*
 typechain-types/*
-yarn.lock
 yarn_error.log
 
 .yalc
