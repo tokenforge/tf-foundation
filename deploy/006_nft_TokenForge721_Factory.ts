@@ -11,6 +11,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const {deployer} = await getNamedAccounts();
     console.log("Deployer", deployer)
 
+    console.log("Deploying TokenForge721Factory")
     const instance = await deploy('TokenForge721Factory', {
         from: deployer,
         args: [],
@@ -26,4 +27,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 export default func;
 func.dependencies = [];
-func.tags = ['TokenForge1155v3Factory'];
+func.tags = ['TokenForge721Factory'];

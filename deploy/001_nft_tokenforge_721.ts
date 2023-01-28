@@ -28,4 +28,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.dependencies = ['TokenForge721'];
+func.tags = ['TokenForge721'];
