@@ -25,7 +25,7 @@ import "@openzeppelin/contracts/proxy/Clones.sol";
 import "../nft/native/TokenForge721.sol";
 import "../nft/native/TokenForge721gov.sol";
 
-contract TokenForge721Factory is Context, AccessControlEnumerable {
+contract TokenForge721govFactory is Context, AccessControlEnumerable {
     event ContractDeployed(address contractAddress);
 
     mapping(address => address[]) private _deployedContracts;
@@ -34,14 +34,14 @@ contract TokenForge721Factory is Context, AccessControlEnumerable {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
-    function createTokenForge721(
+    function createTokenForge721gov(
         string memory name,
         string memory symbol,
         address signer,
         string memory baseUri,
         bool transferOwnership
-    ) public returns (TokenForge721) {
-        TokenForge721 inst = new TokenForge721(name, symbol, signer, baseUri);
+    ) public returns (TokenForge721gov) {
+        TokenForge721gov inst = new TokenForge721gov(name, symbol, signer, baseUri);
 
         if (transferOwnership) {
             inst.transferOwnership(_msgSender());
