@@ -33,7 +33,6 @@ const PRIVATE_KEY_RINKEBY =
     process.env.PRIVATE_KEY_RINKEBY! ||
     '0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3'; // well known private key
 
-
 const config: HardhatUserConfig = {
     defaultNetwork: 'hardhat',
     solidity: {
@@ -51,6 +50,7 @@ const config: HardhatUserConfig = {
         deployer: 0,
         admin: 0,
         backend: 1,
+        signer: process.env['SIGNER_ADDRESS'] as string,
     },
 
     networks: addForkConfiguration({
@@ -78,13 +78,13 @@ const config: HardhatUserConfig = {
         },
         arbitrum_goerli: {
             url: node_url('ARBITRUM_GOERLI'),
-            accounts: accounts('goerli'),
+            accounts: accounts('arbitrum_goerli'),
             gas: 2100000,
             gasPrice: 8000000000
         },
         optimism_goerli: {
             url: node_url('OPTIMISM_GOERLI'),
-            accounts: accounts('goerli'),
+            accounts: accounts('optimism_goerli'),
             gas: 2100000,
             gasPrice: 8000000000
         },       
@@ -98,7 +98,7 @@ const config: HardhatUserConfig = {
             url: 'https://api.avax.network/ext/bc/C/rpc',
             gasPrice: 225000000000,
             chainId: 43114,
-            accounts: accounts('fuji'),
+            accounts: accounts('avax'),
         },
         // Moonbase Alpha network specification (MoonBeam)
         moonbaseAlpha: {
@@ -133,7 +133,8 @@ const config: HardhatUserConfig = {
     paths: {
         sources: "./contracts",
         artifacts: "./artifacts",
-        cache: "./cache"
+        cache: "./cache",
+        deployments: '../deployments/tf-foundation',
     },
 
     /*gasReporter: {
@@ -154,8 +155,8 @@ const config: HardhatUserConfig = {
             deployments: {
                 // process.env.HARDHAT_FORK will specify the network that the fork is made from.
                 // these lines allow it to fetch the deployments from the network being forked from both for node and deploy task
-                hardhat: ['deployments/' + process.env.HARDHAT_FORK],
-                localhost: ['deployments/' + process.env.HARDHAT_FORK],
+                hardhat: ['../deployments/tf-foundation/' + process.env.HARDHAT_FORK],
+                localhost: ['../deployments/tf-foundation/' + process.env.HARDHAT_FORK],
             },
         }
         : undefined,
