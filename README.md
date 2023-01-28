@@ -1,4 +1,4 @@
-# TokenForuce Foundation contracts
+# TokenForge Foundation contracts
 
 ## Introduction
 
