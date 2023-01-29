@@ -93,5 +93,4 @@ contract TokenForge721gov is TokenForge721 {
     ) public virtual onlyTransferor {
         _safeTransfer(from, to, tokenId, data);
     }
-    
 }
