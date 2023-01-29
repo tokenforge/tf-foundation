@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// (C) by TokenForge GmbH, Berlin
+// (C) by TokenForge GmbH, Berlin. All rights reserved.
 // Author: Hagen Hübel, hagen@token-forge.io
 /**
  * @dev Learn more about this on https://token-forge.io
