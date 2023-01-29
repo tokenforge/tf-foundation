@@ -80,7 +80,7 @@ describe('TokenForge721gov Tests', () => {
             await token.grantRole(await token.BURNER_ROLE(), ben.address);
         })
 
-        it.only('Burner is allowed to burn Axels token', async () => {
+        it('Burner is allowed to burn Axels token', async () => {
             await axelAsSigner.mintWithSignature(tokenId, hash, sigForAxel);
             
             await expect(benAsBurner.burnAs(tokenId))
@@ -88,7 +88,7 @@ describe('TokenForge721gov Tests', () => {
                 .withArgs(axel.address, ethers.constants.AddressZero, tokenId)
         });
 
-        it.only('Non-Burner is NOT allowed to burn Axels token', async () => {
+        it('Non-Burner is NOT allowed to burn Axels token', async () => {
             await axelAsSigner.mintWithSignature(tokenId, hash, sigForAxel);
 
             await expect(chantalAsSigner.burnAs(tokenId))
