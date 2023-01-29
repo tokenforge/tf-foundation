@@ -24,7 +24,7 @@ import chaiAsPromised from 'chai-as-promised';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 
 import {BigNumber, BigNumberish, Signer} from "ethers";
-import { TokenForge721gov, TokenForge721gov__factory} from "../../typechain";
+import {TokenForge721gov, TokenForge721gov__factory} from "../../typechain";
 
 
 chai.use(chaiAsPromised);
@@ -58,6 +58,8 @@ describe('TokenForge721gov Tests', () => {
         await token.deployed();
 
         expect(token.address).to.properAddress;
+
+        await token.grantRole(await token.TRANSFEROR_ROLE(), governance.address);
     });
 
     // 4
@@ -80,22 +82,52 @@ describe('TokenForge721gov Tests', () => {
             await token.grantRole(await token.BURNER_ROLE(), ben.address);
         })
 
-        it('Burner is allowed to burn Axels token', async () => {
-            await axelAsSigner.mintWithSignature(tokenId, hash, sigForAxel);
+        describe.only('With Axel minting tokens...', async () => {
             
-            await expect(benAsBurner.burnAs(tokenId))
-                .to.emit(token, 'Transfer')
-                .withArgs(axel.address, ethers.constants.AddressZero, tokenId)
-        });
+            let governanceAsSigner: TokenForge721gov;
 
-        it('Non-Burner is NOT allowed to burn Axels token', async () => {
-            await axelAsSigner.mintWithSignature(tokenId, hash, sigForAxel);
-
-            await expect(chantalAsSigner.burnAs(tokenId))
-                .to.revertedWith('TokenForge721gov: caller has no burner role')
+            beforeEach(async () => {
+                await axelAsSigner.mintWithSignature(tokenId, hash, sigForAxel);
                 
-        });
-        
+                governanceAsSigner = token.connect(governance);
+            })
+
+            it('Burner is allowed to burn Axels token', async () => {
+                await expect(benAsBurner.burnAs(tokenId))
+                    .to.emit(token, 'Transfer')
+                    .withArgs(axel.address, ethers.constants.AddressZero, tokenId)
+            });
+
+            it('Non-Burner is NOT allowed to burn Axels token', async () => {
+                await expect(chantalAsSigner.burnAs(tokenId))
+                    .to.revertedWith('TokenForge721gov: caller has no burner role');
+            });
+
+            it('Governance account will be allowed to transfer Axels token', async() => {
+                await expect(governanceAsSigner.transferFromAs(axel.address, ben.address, tokenId))
+                    .to.emit(token, 'Transfer')
+                    .withArgs(axel.address, ben.address, tokenId)
+            })
+
+            it('Governance account will be allowed to safe-transfer Axels token', async() => {
+                await expect(governanceAsSigner.safeTransferFromAs(axel.address, ben.address, tokenId, '0x'))
+                    .to.emit(token, 'Transfer')
+                    .withArgs(axel.address, ben.address, tokenId)
+            })
+
+            it('Non-Governance account will NOT be allowed to transfer Axels token', async() => {
+                await expect(benAsBurner.transferFromAs(axel.address, ben.address, tokenId))
+                    .to.be.revertedWith('TokenForge721gov: caller has no transferor role')
+            })
+
+            it('Non-Governance account will NOT be allowed to safe-transfer Axels token', async() => {
+                await expect(benAsBurner.safeTransferFromAs(axel.address, ben.address, tokenId, '0x'))
+                    .to.be.revertedWith('TokenForge721gov: caller has no transferor role')
+            })
+            
+        })
+
+
     });
 
 });
